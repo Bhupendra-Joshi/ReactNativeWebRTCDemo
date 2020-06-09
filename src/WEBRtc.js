@@ -7,17 +7,14 @@ export default function WEBRtc({ roomNumber }) {
   const [localStream, setLocalStream] = useState();
   const [remoteStream, setRemoteStream] = useState();
 
-
   let isCaller, peerConnection;
   const socket = io("https://desolate-earth-25164.herokuapp.com/");
   // const socket = io("http://192.168.0.102:3000");
-
 
   const constraints = {
     audio: true,
     video: true
   };
-
 
   /**
    * Getting ready for local stream 
@@ -110,11 +107,9 @@ export default function WEBRtc({ roomNumber }) {
 
     });
 
-
     function setUpConnection(stream) {
-      peerConnection = new RTCPeerConnection(configuration);
       console.log('offer');
-
+      peerConnection = new RTCPeerConnection(configuration);
       peerConnection.onicecandidate = onIceCandidate;
       peerConnection.onaddstream = onAddStream;
       peerConnection.addStream(stream);
@@ -129,13 +124,10 @@ export default function WEBRtc({ roomNumber }) {
       }
     };
 
-
     function onIceCandidate(event) {
       console.log('ice candidate');
-
       if (event.candidate) {
         console.log('sending ice candidate', event.candidate);
-
         socket.emit('candidate', {
           type: 'candidate',
           sdpMLineIndex: event.candidate.sdpMLineIndex,
@@ -145,8 +137,6 @@ export default function WEBRtc({ roomNumber }) {
         });
       }
     }
-
-
 
     socket.on('candidate', e => {
       console.log('candidate', isCaller);
@@ -158,7 +148,6 @@ export default function WEBRtc({ roomNumber }) {
       console.log('answer', e);
       peerConnection.setRemoteDescription(e);
     });
-
 
   }, [localStream, remoteStream]);
 
@@ -228,121 +217,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-around',
-
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-// socket.on("ready",()=>{
-
-//   if(isCaller){
-//     console.log('ready');
-//     localPC.onicecandidate = onIceCandidateLocal;
-//     localPC.addStream(localST);
-//     // localPC.onaddstream = onAddStream;
-
-//     localPC.createOffer()
-//      .then(offer=>{
-//         localPC.setLocalDescription(offer)
-//         .then(()=>{
-//           remotePC.setRemoteDescription(localPC.localDescription);
-
-//           console.log('ofer start');
-//           socket.emit('offer',{
-//             type:'offer',
-//             sdp:offer.sdp,
-//             room: roomNumber
-//           });
-//         });
-//      }).catch(error=>{
-//       console.log(error);
-//   });
-//   }
-// });
-
-
-// socket.on("offer",e=>{
-
-//     if(!isCaller){
-//       console.log('offer');
-//         remotePC.onicecandidate = onIceCandidateRemote;
-//         remotePC.onaddstream = onAddStream;
-
-//         // remotePC.setRemoteDescription(localPC.localDescription);
-//         remotePC.createAnswer().then(answer=>{
-//             console.log('answer start');
-//               remotePC.setLocalDescription(answer)
-//               .then(()=>{
-//                   localPC.setRemoteDescription(remotePC.localDescription);
-//                   socket.emit('answer',{
-//                     type:'answer',
-//                     sdp: answer.sdp,
-//                     room: roomNumber
-//                 });
-//               });
-//         }).catch(error=>{
-//           console.log("answer error", error);
-//       });
-//       // console.log(`Answer from remotePC: ${answer.sdp}`);
-//     }
-
-// });
-
-// function onIceCandidateLocal(e){
-//   if (e.candidate) {
-//         socket.emit('candidateLocal',{
-//             type: 'candidateLocal',
-//             label: e.candidate.sdpMLineIndex,
-//             id: e.candidate.sdpMid,
-//             candidate: e.candidate.candidate,
-//             room: roomNumber
-//         });
-//     }
-// }
-
-
-// function onIceCandidateRemote(e){
-//   if (e.candidate) {
-//         socket.emit('candidateRemote',{
-//             type: 'candidateRemote',
-//             label: e.candidate.sdpMLineIndex,
-//             id: e.candidate.sdpMid,
-//             candidate: e.candidate.candidate,
-//             room: roomNumber
-//         });
-//     }
-// }
-
-// socket.on('candidateLocal', e=>{
-//   console.log('candidateLocal', e.candidate);
-//   remotePC.addIceCandidate(e.candidate);
-// });
-
-// socket.on('candidateRemote', e=>{
-//   console.log('candidateRemote');
-//   localPC.addIceCandidate(e.candidate);
-// });
-
-
-// function onAddStream(e){
-//   console.log('add remote stream', e.steram);
-
-//   if (e.stream && remoteStream !== e.stream) {
-//     setRemoteStream(e.stream);
-//   }
-// };
-
-
-// socket.on('answer', e=>{
-//   console.log('answer');
-//   localPC.setRemoteDescription(remotePC.localDescription);
-// });
